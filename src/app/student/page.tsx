@@ -1,6 +1,8 @@
+import { CalendarDays, Clock, Lock, Sparkles, Star } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
+import { EmptyState } from "@/components/empty-state";
 import {
   Card,
   CardContent,
@@ -15,7 +17,6 @@ import {
   isPastDeadline,
   timeUntil,
 } from "@/lib/date";
-import type { InstitutionType } from "@/lib/db/types";
 import {
   SelectionForm,
   type PublisherOption,
@@ -28,6 +29,11 @@ type Week = {
   selection_deadline: string;
   is_locked: boolean;
 };
+
+const studentNav = [
+  { href: "/student", label: "Yaklaşan Sınav", icon: CalendarDays, match: "exact" as const },
+  { href: "/student/gecmis", label: "Geçmiş Sınavlarım", icon: Clock },
+];
 
 export default async function StudentHome() {
   const user = await requireUser("STUDENT");
@@ -43,63 +49,54 @@ export default async function StudentHome() {
     .limit(1)
     .maybeSingle<Week>();
 
-  const nav = [
-    { href: "/student", label: "Yaklaşan Sınav" },
-    { href: "/student/gecmis", label: "Geçmiş Sınavlarım" },
-  ];
-
   if (!week) {
     return (
       <>
-        <AppHeader user={user} nav={nav} />
-        <main className="mx-auto w-full max-w-3xl px-4 py-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Yaklaşan sınav yok</CardTitle>
-              <CardDescription>
-                Kurumunuz haftalık konfigürasyonu girdiğinde burada görünecek.
-              </CardDescription>
-            </CardHeader>
-            <CardContent />
-          </Card>
+        <AppHeader user={user} nav={studentNav} />
+        <main className="mx-auto w-full max-w-3xl px-4 py-10">
+          <EmptyState
+            icon={CalendarDays}
+            title="Yaklaşan sınav yok"
+            description="Kurumun haftalık konfigürasyonu girdiğinde burada görünecek. Bir süre sonra tekrar bak."
+          />
         </main>
       </>
     );
   }
 
-  const [{ data: publishers = [] }, { data: sessionsRaw = [] }, { data: mySel }] =
-    await Promise.all([
-      supabase
-        .from("publishers")
-        .select("id, name, is_default")
-        .eq("exam_week_id", week.id)
-        .order("name")
-        .returns<PublisherOption[]>(),
-      supabase
-        .from("sessions")
-        .select("id, session_datetime, capacity, is_open, is_default")
-        .eq("exam_week_id", week.id)
-        .order("session_datetime")
-        .returns<
-          Omit<SessionOption, "used">[]
-        >(),
-      supabase
-        .from("selections")
-        .select(
-          "publisher_id, session_id, is_default_assigned, publishers(name), sessions(session_datetime)",
-        )
-        .eq("student_id", user.id)
-        .eq("exam_week_id", week.id)
-        .maybeSingle<{
-          publisher_id: string;
-          session_id: string | null;
-          is_default_assigned: boolean;
-          publishers: { name: string } | null;
-          sessions: { session_datetime: string } | null;
-        }>(),
-    ]);
+  const [
+    { data: publishers = [] },
+    { data: sessionsRaw = [] },
+    { data: mySel },
+  ] = await Promise.all([
+    supabase
+      .from("publishers")
+      .select("id, name, is_default")
+      .eq("exam_week_id", week.id)
+      .order("name")
+      .returns<PublisherOption[]>(),
+    supabase
+      .from("sessions")
+      .select("id, session_datetime, capacity, is_open, is_default")
+      .eq("exam_week_id", week.id)
+      .order("session_datetime")
+      .returns<Omit<SessionOption, "used">[]>(),
+    supabase
+      .from("selections")
+      .select(
+        "publisher_id, session_id, is_default_assigned, publishers(name), sessions(session_datetime)",
+      )
+      .eq("student_id", user.id)
+      .eq("exam_week_id", week.id)
+      .maybeSingle<{
+        publisher_id: string;
+        session_id: string | null;
+        is_default_assigned: boolean;
+        publishers: { name: string } | null;
+        sessions: { session_datetime: string } | null;
+      }>(),
+  ]);
 
-  // Seans başı doluluk
   const { data: selCounts = [] } = await supabase
     .from("selections")
     .select("session_id")
@@ -121,49 +118,88 @@ export default async function StudentHome() {
 
   return (
     <>
-      <AppHeader user={user} nav={nav} />
+      <AppHeader user={user} nav={studentNav} />
       <main className="mx-auto w-full max-w-3xl space-y-6 px-4 py-8">
-        <div>
-          <h1 className="text-2xl font-semibold">
-            Yaklaşan sınav — {formatDate(week.exam_date)}
-          </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-            <span>{user.institution_name}</span>
-            <span>·</span>
-            <span>Deadline: {formatDate(week.selection_deadline)}</span>
-            {past ? (
-              <Badge variant="secondary">Seçim kilitli</Badge>
-            ) : (
-              <Badge>Kalan: {timeUntil(week.selection_deadline)}</Badge>
-            )}
+        {/* Hero kart */}
+        <div className="overflow-hidden rounded-2xl bg-brand-gradient text-primary-foreground shadow-lg">
+          <div className="space-y-4 p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary-foreground/80">
+              <Sparkles className="h-3.5 w-3.5" />
+              Yaklaşan sınav
+            </div>
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h1 className="text-2xl font-bold sm:text-3xl">
+                  {formatDate(week.exam_date)}
+                </h1>
+                <p className="text-sm text-primary-foreground/80">
+                  {user.institution_name}
+                </p>
+              </div>
+              <div className="rounded-xl bg-primary-foreground/15 px-4 py-2 backdrop-blur">
+                {past ? (
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Lock className="h-4 w-4" />
+                    Seçim kilitli
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-xs uppercase tracking-wider text-primary-foreground/70">
+                      Kalan
+                    </div>
+                    <div className="text-lg font-bold">
+                      {timeUntil(week.selection_deadline)}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
         {mySel ? (
-          <Card>
+          <Card
+            className={
+              mySel.is_default_assigned
+                ? "border-muted-foreground/20"
+                : "border-success/40 bg-success/5"
+            }
+          >
             <CardHeader>
-              <CardTitle className="text-base">Mevcut seçimin</CardTitle>
-              {mySel.is_default_assigned && (
+              <CardTitle className="flex items-center gap-2 text-base">
+                {mySel.is_default_assigned ? (
+                  <>
+                    <Star className="h-4 w-4 fill-current text-muted-foreground" />
+                    Sana atanan seçim
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 text-success" />
+                    Mevcut seçimin
+                  </>
+                )}
+              </CardTitle>
+              {mySel.is_default_assigned ? (
                 <CardDescription>
-                  Bu seçim <strong>varsayılan</strong> olarak atandı.
+                  Seçim yapmadığın için varsayılan otomatik atandı.
                 </CardDescription>
-              )}
+              ) : null}
             </CardHeader>
             <CardContent className="space-y-1 text-sm">
               <div>
-                <span className="text-zinc-500">Yayın:</span>{" "}
-                <span className="font-medium">
+                <span className="text-muted-foreground">Yayın:</span>{" "}
+                <span className="font-semibold">
                   {mySel.publishers?.name ?? "—"}
                 </span>
               </div>
-              {mySel.sessions?.session_datetime && (
+              {mySel.sessions?.session_datetime ? (
                 <div>
-                  <span className="text-zinc-500">Seans:</span>{" "}
-                  <span className="font-medium">
+                  <span className="text-muted-foreground">Seans:</span>{" "}
+                  <span className="font-semibold">
                     {formatDateTime(mySel.sessions.session_datetime)}
                   </span>
                 </div>
-              )}
+              ) : null}
             </CardContent>
           </Card>
         ) : null}
@@ -171,7 +207,10 @@ export default async function StudentHome() {
         {past ? (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Seçim süresi doldu</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Lock className="h-4 w-4" />
+                Seçim süresi doldu
+              </CardTitle>
               <CardDescription>
                 {mySel
                   ? "Seçimini yukarıda görebilirsin."
@@ -186,7 +225,7 @@ export default async function StudentHome() {
                 {mySel ? "Seçimini değiştir" : "Seçimini yap"}
               </CardTitle>
               <CardDescription>
-                Deadline: {formatDateTime(week.selection_deadline)}
+                Son tarih: {formatDateTime(week.selection_deadline)}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -201,16 +240,11 @@ export default async function StudentHome() {
             </CardContent>
           </Card>
         ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                Henüz yayın tanımlanmadı
-              </CardTitle>
-              <CardDescription>
-                Kurumunuz bu hafta için yayınları girince burada görünecek.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <EmptyState
+            icon={Sparkles}
+            title="Henüz yayın tanımlanmadı"
+            description="Kurumun bu hafta için yayınları girince seçim ekranı burada açılacak."
+          />
         )}
       </main>
     </>

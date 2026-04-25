@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { CalendarDays, ChevronRight, Lock, Plus } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import {
   Card,
   CardContent,
@@ -20,6 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate, isPastDeadline, timeUntil } from "@/lib/date";
+import { ADMIN_NAV } from "@/lib/nav";
 import { NewWeekDialog } from "./new-week-dialog";
 
 type WeekRow = {
@@ -55,49 +59,55 @@ export default async function WeeksPage() {
     .limit(20)
     .returns<WeekRow[]>();
 
+  const hasAny = (upcoming?.length ?? 0) + (past?.length ?? 0) > 0;
+
   return (
     <>
-      <AppHeader
-        user={user}
-        nav={[
-          { href: "/admin", label: "Dashboard" },
-          { href: "/admin/hafta", label: "Haftalık Sınav" },
-          { href: "/admin/ogrenciler", label: "Öğrenciler" },
-          { href: "/admin/rapor", label: "Rapor" },
-        ]}
-      />
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Haftalık sınavlar</h1>
-            <p className="text-sm text-zinc-500">
-              Her hafta için lokasyon bazında sınav kaydı oluştur, seans ve yayın tanımla.
-            </p>
-          </div>
-          <NewWeekDialog institutions={institutions ?? []} />
-        </div>
+      <AppHeader user={user} nav={ADMIN_NAV} />
+      <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-8">
+        <PageHeader
+          title="Haftalık sınavlar"
+          description="Her hafta için lokasyon bazında sınav kaydı oluştur, seans ve yayın tanımla."
+          action={<NewWeekDialog institutions={institutions ?? []} />}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Yaklaşan</CardTitle>
-            <CardDescription>
-              Seçim deadline&apos;ı geçmemiş haftalar
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <WeekTable rows={upcoming ?? []} emptyMessage="Yaklaşan hafta yok." />
-          </CardContent>
-        </Card>
+        {!hasAny ? (
+          <EmptyState
+            icon={CalendarDays}
+            title="Henüz hafta yok"
+            description="İlk sınav haftasını oluşturmak için sağ üstteki butonu kullan."
+          />
+        ) : (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Yaklaşan</CardTitle>
+                <CardDescription>
+                  Seçim deadline&apos;ı geçmemiş haftalar
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <WeekTable
+                  rows={upcoming ?? []}
+                  emptyMessage="Yaklaşan hafta yok."
+                />
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Geçmiş</CardTitle>
-            <CardDescription>Son 20 hafta</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <WeekTable rows={past ?? []} emptyMessage="Geçmiş hafta yok." />
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Geçmiş</CardTitle>
+                <CardDescription>Son 20 hafta</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <WeekTable
+                  rows={past ?? []}
+                  emptyMessage="Geçmiş hafta yok."
+                />
+              </CardContent>
+            </Card>
+          </>
+        )}
       </main>
     </>
   );
@@ -112,7 +122,9 @@ function WeekTable({
 }) {
   if (rows.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-zinc-500">{emptyMessage}</p>
+      <p className="py-6 text-center text-sm text-muted-foreground">
+        {emptyMessage}
+      </p>
     );
   }
   return (
@@ -130,20 +142,30 @@ function WeekTable({
         {rows.map((w) => {
           const past = isPastDeadline(w.selection_deadline);
           return (
-            <TableRow key={w.id}>
-              <TableCell>{w.institutions?.name ?? "—"}</TableCell>
+            <TableRow key={w.id} className="hover:bg-primary/5">
+              <TableCell className="font-medium">
+                {w.institutions?.name ?? "—"}
+              </TableCell>
               <TableCell>{formatDate(w.exam_date)}</TableCell>
-              <TableCell>{formatDate(w.selection_deadline)}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {formatDate(w.selection_deadline)}
+              </TableCell>
               <TableCell>
                 {past ? (
-                  <Badge variant="secondary">Kilitli</Badge>
+                  <Badge variant="secondary" className="gap-1">
+                    <Lock className="h-3 w-3" />
+                    Kilitli
+                  </Badge>
                 ) : (
                   <Badge>{timeUntil(w.selection_deadline)}</Badge>
                 )}
               </TableCell>
               <TableCell className="text-right">
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/admin/hafta/${w.id}`}>Düzenle</Link>
+                <Button asChild variant="ghost" size="sm" className="gap-1">
+                  <Link href={`/admin/hafta/${w.id}`}>
+                    Düzenle
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
                 </Button>
               </TableCell>
             </TableRow>

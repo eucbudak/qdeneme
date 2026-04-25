@@ -1,7 +1,9 @@
+import { BookOpen, Clock, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
+import { PageHeader } from "@/components/page-header";
 import {
   Card,
   CardContent,
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, isPastDeadline, timeUntil } from "@/lib/date";
+import { ADMIN_NAV } from "@/lib/nav";
 import type { InstitutionType } from "@/lib/db/types";
 import { SessionsPanel } from "./sessions-panel";
 import { PublishersPanel } from "./publishers-panel";
@@ -75,7 +78,6 @@ export default async function WeekDetailPage({
     .order("name")
     .returns<PublisherRow[]>();
 
-  // Seans başı seçim sayısı (kapasite doluluk için)
   const { data: selCounts = [] } = await supabase
     .from("selections")
     .select("session_id")
@@ -94,33 +96,32 @@ export default async function WeekDetailPage({
 
   return (
     <>
-      <AppHeader
-        user={user}
-        nav={[
-          { href: "/admin", label: "Dashboard" },
-          { href: "/admin/hafta", label: "Haftalık Sınav" },
-          { href: "/admin/ogrenciler", label: "Öğrenciler" },
-          { href: "/admin/rapor", label: "Rapor" },
-        ]}
-      />
-      <main className="mx-auto w-full max-w-5xl px-4 py-8 space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">
-            {week.institutions?.name} — {formatDate(week.exam_date)}
-          </h1>
-          <div className="mt-2 flex items-center gap-3 text-sm text-zinc-500">
-            <span>Deadline: {formatDate(week.selection_deadline)}</span>
-            {past ? (
-              <Badge variant="secondary">Seçim kilitli</Badge>
+      <AppHeader user={user} nav={ADMIN_NAV} />
+      <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-8">
+        <PageHeader
+          title={`${week.institutions?.name} — ${formatDate(week.exam_date)}`}
+          description={`Deadline: ${formatDate(week.selection_deadline)}`}
+          action={
+            past ? (
+              <Badge variant="secondary" className="gap-1">
+                <Lock className="h-3 w-3" />
+                Seçim kilitli
+              </Badge>
             ) : (
-              <Badge>Kalan: {timeUntil(week.selection_deadline)}</Badge>
-            )}
-          </div>
-        </div>
+              <Badge className="gap-1">
+                <Clock className="h-3 w-3" />
+                {timeUntil(week.selection_deadline)}
+              </Badge>
+            )
+          }
+        />
 
         <Card>
           <CardHeader>
-            <CardTitle>Seanslar</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Clock className="h-4 w-4 text-primary" />
+              Seanslar
+            </CardTitle>
             <CardDescription>
               {institutionType === "Q_WORK"
                 ? "Q work — birden çok seans tanımlayabilirsin. Varsayılan Pazar 10:00 olmalı."
@@ -140,7 +141,10 @@ export default async function WeekDetailPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Yayınlar</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BookOpen className="h-4 w-4 text-primary" />
+              Yayınlar
+            </CardTitle>
             <CardDescription>
               En az bir yayın ekle. Varsayılan olan, seçim yapmayana atanır.
             </CardDescription>

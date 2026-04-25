@@ -1,6 +1,9 @@
+import { Users } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import {
   Card,
   CardContent,
@@ -17,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ADMIN_NAV } from "@/lib/nav";
 import { NewStudentDialog } from "./new-student-dialog";
 import { ResetPasswordButton, ToggleActiveButton } from "./student-actions";
 
@@ -40,42 +44,39 @@ export default async function StudentsPage() {
 
   const { data: students = [] } = await supabase
     .from("profiles")
-    .select("id, username, full_name, is_active, institution_id, institutions(name)")
+    .select(
+      "id, username, full_name, is_active, institution_id, institutions(name)",
+    )
     .eq("role", "STUDENT")
     .order("full_name")
     .returns<StudentRow[]>();
 
+  const activeCount = students?.filter((s) => s.is_active).length ?? 0;
+  const inactiveCount = (students?.length ?? 0) - activeCount;
+
   return (
     <>
-      <AppHeader
-        user={user}
-        nav={[
-          { href: "/admin", label: "Dashboard" },
-          { href: "/admin/hafta", label: "Haftalık Sınav" },
-          { href: "/admin/ogrenciler", label: "Öğrenciler" },
-          { href: "/admin/rapor", label: "Rapor" },
-        ]}
-      />
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Öğrenciler</h1>
-            <p className="text-sm text-zinc-500">
-              Toplam {students?.length ?? 0} öğrenci
-            </p>
-          </div>
-          <NewStudentDialog institutions={institutions ?? []} />
-        </div>
+      <AppHeader user={user} nav={ADMIN_NAV} />
+      <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-8">
+        <PageHeader
+          title="Öğrenciler"
+          description={
+            students && students.length > 0
+              ? `${activeCount} aktif · ${inactiveCount} pasif`
+              : "Henüz öğrenci eklenmedi."
+          }
+          action={<NewStudentDialog institutions={institutions ?? []} />}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Liste</CardTitle>
-            <CardDescription>
-              Şifreyi sıfırladığında yeni şifreyi öğrenciye sen ileteceksin.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {students && students.length > 0 ? (
+        {students && students.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Liste</CardTitle>
+              <CardDescription>
+                Şifreyi sıfırladığında yeni şifreyi öğrenciye sen ileteceksin.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -88,7 +89,7 @@ export default async function StudentsPage() {
                 </TableHeader>
                 <TableBody>
                   {students.map((s) => (
-                    <TableRow key={s.id}>
+                    <TableRow key={s.id} className="hover:bg-primary/5">
                       <TableCell className="font-medium">
                         {s.full_name}
                       </TableCell>
@@ -98,12 +99,14 @@ export default async function StudentsPage() {
                       <TableCell>{s.institutions?.name ?? "—"}</TableCell>
                       <TableCell>
                         {s.is_active ? (
-                          <Badge variant="default">Aktif</Badge>
+                          <Badge className="bg-success text-success-foreground hover:bg-success">
+                            Aktif
+                          </Badge>
                         ) : (
                           <Badge variant="secondary">Pasif</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-right space-x-2">
+                      <TableCell className="space-x-2 text-right">
                         <ResetPasswordButton
                           studentId={s.id}
                           studentName={s.full_name}
@@ -118,13 +121,15 @@ export default async function StudentsPage() {
                   ))}
                 </TableBody>
               </Table>
-            ) : (
-              <p className="text-sm text-zinc-500 py-8 text-center">
-                Henüz öğrenci eklenmedi.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <EmptyState
+            icon={Users}
+            title="Henüz öğrenci yok"
+            description="İlk öğrenciyi sağ üstteki butonla ekle. Vereceğin kullanıcı adı ve şifreyle öğrenci giriş yapabilir."
+          />
+        )}
       </main>
     </>
   );

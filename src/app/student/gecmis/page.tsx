@@ -1,10 +1,12 @@
+import { CalendarDays, Clock, Trophy } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -28,6 +30,11 @@ type PastRow = {
   sessions: { session_datetime: string } | null;
 };
 
+const studentNav = [
+  { href: "/student", label: "Yaklaşan Sınav", icon: CalendarDays, match: "exact" as const },
+  { href: "/student/gecmis", label: "Geçmiş Sınavlarım", icon: Clock },
+];
+
 export default async function StudentHistory() {
   const user = await requireUser("STUDENT");
   const supabase = await createClient();
@@ -44,26 +51,21 @@ export default async function StudentHistory() {
     .order("exam_weeks(exam_date)", { ascending: false })
     .returns<PastRow[]>();
 
-  const nav = [
-    { href: "/student", label: "Yaklaşan Sınav" },
-    { href: "/student/gecmis", label: "Geçmiş Sınavlarım" },
-  ];
-
   return (
     <>
-      <AppHeader user={user} nav={nav} />
+      <AppHeader user={user} nav={studentNav} />
       <main className="mx-auto w-full max-w-4xl space-y-6 px-4 py-8">
-        <h1 className="text-2xl font-semibold">Geçmiş sınavlarım</h1>
+        <PageHeader
+          title="Geçmiş sınavlarım"
+          description="Bugüne kadar girdiğin veya sana atanan sınavlar."
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Tüm haftalar</CardTitle>
-            <CardDescription>
-              Bugüne kadar girdiğin veya sana atanan sınavlar.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {past && past.length > 0 ? (
+        {past && past.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Tüm haftalar</CardTitle>
+            </CardHeader>
+            <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -76,7 +78,7 @@ export default async function StudentHistory() {
                 <TableBody>
                   {past.map((p) => (
                     <TableRow key={p.id}>
-                      <TableCell>
+                      <TableCell className="font-medium">
                         {p.exam_weeks?.exam_date
                           ? formatDate(p.exam_weeks.exam_date)
                           : "—"}
@@ -89,22 +91,28 @@ export default async function StudentHistory() {
                       </TableCell>
                       <TableCell>
                         {p.is_default_assigned ? (
-                          <Badge variant="outline">Varsayılan</Badge>
+                          <Badge variant="outline" className="text-muted-foreground">
+                            Varsayılan
+                          </Badge>
                         ) : (
-                          <Badge>Kendi seçtin</Badge>
+                          <Badge className="bg-success text-success-foreground hover:bg-success">
+                            Kendi seçtin
+                          </Badge>
                         )}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            ) : (
-              <p className="py-8 text-center text-sm text-zinc-500">
-                Henüz geçmiş sınav yok.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <EmptyState
+            icon={Trophy}
+            title="Henüz geçmiş sınav yok"
+            description="Sınavlara girdikçe burada listelenir."
+          />
+        )}
       </main>
     </>
   );
