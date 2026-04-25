@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type NavItem = {
   href: string;
   label: string;
-  icon?: LucideIcon;
+  icon?: React.ReactNode;
   match?: "exact" | "prefix";
 };
 
@@ -17,7 +16,6 @@ export function NavLinks({ items }: { items: NavItem[] }) {
   return (
     <nav className="hidden items-center gap-1 sm:flex">
       {items.map((item) => {
-        const Icon = item.icon;
         const isActive =
           item.match === "exact"
             ? pathname === item.href
@@ -33,7 +31,7 @@ export function NavLinks({ items }: { items: NavItem[] }) {
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
-            {Icon ? <Icon className="h-4 w-4" strokeWidth={2} /> : null}
+            {item.icon}
             <span>{item.label}</span>
             {isActive ? (
               <span

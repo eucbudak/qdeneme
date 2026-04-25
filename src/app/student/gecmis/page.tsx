@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDate, formatDateTime } from "@/lib/date";
+import { STUDENT_NAV } from "@/lib/nav";
 
 type PastRow = {
   id: string;
@@ -29,11 +30,6 @@ type PastRow = {
   publishers: { name: string } | null;
   sessions: { session_datetime: string } | null;
 };
-
-const studentNav = [
-  { href: "/student", label: "Yaklaşan Sınav", icon: CalendarDays, match: "exact" as const },
-  { href: "/student/gecmis", label: "Geçmiş Sınavlarım", icon: Clock },
-];
 
 export default async function StudentHistory() {
   const user = await requireUser("STUDENT");
@@ -53,7 +49,7 @@ export default async function StudentHistory() {
 
   return (
     <>
-      <AppHeader user={user} nav={studentNav} />
+      <AppHeader user={user} nav={STUDENT_NAV} />
       <main className="mx-auto w-full max-w-4xl space-y-6 px-4 py-8">
         <PageHeader
           title="Geçmiş sınavlarım"

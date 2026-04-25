@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, Lock, Sparkles, Star } from "lucide-react";
+import { CalendarDays, Lock, Sparkles, Star } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
@@ -17,6 +17,7 @@ import {
   isPastDeadline,
   timeUntil,
 } from "@/lib/date";
+import { STUDENT_NAV } from "@/lib/nav";
 import {
   SelectionForm,
   type PublisherOption,
@@ -29,11 +30,6 @@ type Week = {
   selection_deadline: string;
   is_locked: boolean;
 };
-
-const studentNav = [
-  { href: "/student", label: "Yaklaşan Sınav", icon: CalendarDays, match: "exact" as const },
-  { href: "/student/gecmis", label: "Geçmiş Sınavlarım", icon: Clock },
-];
 
 export default async function StudentHome() {
   const user = await requireUser("STUDENT");
@@ -52,7 +48,7 @@ export default async function StudentHome() {
   if (!week) {
     return (
       <>
-        <AppHeader user={user} nav={studentNav} />
+        <AppHeader user={user} nav={STUDENT_NAV} />
         <main className="mx-auto w-full max-w-3xl px-4 py-10">
           <EmptyState
             icon={CalendarDays}
@@ -118,7 +114,7 @@ export default async function StudentHome() {
 
   return (
     <>
-      <AppHeader user={user} nav={studentNav} />
+      <AppHeader user={user} nav={STUDENT_NAV} />
       <main className="mx-auto w-full max-w-3xl space-y-6 px-4 py-8">
         {/* Hero kart */}
         <div className="overflow-hidden rounded-2xl bg-brand-gradient text-primary-foreground shadow-lg">

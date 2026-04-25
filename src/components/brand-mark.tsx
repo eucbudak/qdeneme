@@ -23,6 +23,7 @@ export function BrandMark({ size = "md", href = "/", className }: Props) {
       width={s.w}
       height={s.h}
       priority
+      unoptimized
       className={cn(s.className, "w-auto", className)}
     />
   );
