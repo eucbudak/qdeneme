@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ArrowRight, BookOpen, KeyRound, Star, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand-mark";
+import { HeroIllustration } from "@/components/hero-illustration";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
@@ -37,8 +38,8 @@ export default async function Home() {
               Haftalık deneme kulübü
             </span>
             <h1 className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-              Her hafta seçtiğin{" "}
-              <span className="text-brand-gradient">denemeyle</span> çalış.
+              Her Hafta Seçtiğin{" "}
+              <span className="text-brand-gradient">Denemeye</span> Gir
             </h1>
             <p className="max-w-md text-base text-muted-foreground sm:text-lg">
               Kurumun açtığı yayınlar arasından sana uygun olanı seç, belirlenen
@@ -57,7 +58,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <HeroDecoration />
+          <HeroIllustration className="mx-auto aspect-square w-full max-w-md" />
         </section>
 
         <section
@@ -99,75 +100,6 @@ export default async function Home() {
           <span>© Q Deneme</span>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function HeroDecoration() {
-  return (
-    <div className="relative mx-auto aspect-square w-full max-w-md">
-      <div className="absolute inset-0 rounded-[40%] bg-brand-gradient opacity-20 blur-3xl" />
-      <div className="relative grid h-full place-items-center">
-        <div className="absolute left-4 top-8 rotate-[-6deg]">
-          <FloatingCard
-            label="TYT Toprak"
-            sub="Pazar 10:00"
-            star
-            tone="primary"
-          />
-        </div>
-        <div className="absolute right-2 top-24 rotate-[4deg]">
-          <FloatingCard
-            label="TYT Hız"
-            sub="Cumartesi 14:00"
-            tone="accent"
-          />
-        </div>
-        <div className="absolute bottom-10 left-12 rotate-[-2deg]">
-          <FloatingCard label="TYT 3D" sub="Pazartesi 18:30" tone="muted" />
-        </div>
-        <div className="absolute right-10 bottom-6 rounded-2xl bg-card p-4 shadow-xl ring-1 ring-border">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-gradient text-primary-foreground">
-              <Star className="h-5 w-5 fill-current" />
-            </div>
-            <div className="text-xs">
-              <div className="font-semibold">Seçimin kaydedildi</div>
-              <div className="text-muted-foreground">3 Mayıs Pazar</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FloatingCard({
-  label,
-  sub,
-  star,
-  tone,
-}: {
-  label: string;
-  sub: string;
-  star?: boolean;
-  tone: "primary" | "accent" | "muted";
-}) {
-  const toneClass =
-    tone === "primary"
-      ? "bg-card ring-primary/30 text-foreground"
-      : tone === "accent"
-        ? "bg-card ring-accent/40 text-foreground"
-        : "bg-card ring-border text-muted-foreground";
-  return (
-    <div
-      className={`flex items-center gap-3 rounded-2xl px-4 py-3 shadow-lg ring-1 backdrop-blur ${toneClass}`}
-    >
-      <div className="text-sm">
-        <div className="font-semibold">{label}</div>
-        <div className="text-xs text-muted-foreground">{sub}</div>
-      </div>
-      {star ? <Star className="h-4 w-4 fill-primary text-primary" /> : null}
     </div>
   );
 }

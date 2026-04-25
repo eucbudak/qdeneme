@@ -18,12 +18,11 @@ export function BrandMark({ size = "md", href = "/", className }: Props) {
   const s = SIZES[size];
   const inner = (
     <Image
-      src="/logo.svg"
+      src="/logo.png"
       alt="Q Deneme"
       width={s.w}
       height={s.h}
       priority
-      unoptimized
       className={cn(s.className, "w-auto", className)}
     />
   );
