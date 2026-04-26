@@ -7,11 +7,6 @@ export default function LoginPage() {
     <div className="grid flex-1 lg:grid-cols-[5fr_7fr]">
       {/* Sol: marka paneli (lg+ görünür) */}
       <aside className="hidden flex-col justify-between bg-brand-gradient p-10 text-primary-foreground lg:flex">
-        <BrandMark
-          size="md"
-          href={null}
-          className="brightness-0 invert"
-        />
         <div className="space-y-6">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
@@ -36,14 +31,14 @@ export default function LoginPage() {
       {/* Sağ: form */}
       <main className="flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm space-y-8">
-          <div className="space-y-3 text-center lg:hidden">
-            <BrandMark size="md" href={null} className="mx-auto" />
-          </div>
-          <div className="space-y-2 text-center lg:text-left">
-            <h1 className="text-2xl font-bold">Tekrar hoş geldin</h1>
-            <p className="text-sm text-muted-foreground">
-              Kurumundan aldığın bilgilerle giriş yap.
-            </p>
+          <div className="flex flex-col items-center gap-4 text-center lg:items-start lg:text-left">
+            <BrandMark size="md" href={null} />
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold">Tekrar hoş geldin</h1>
+              <p className="text-sm text-muted-foreground">
+                Kurumundan aldığın bilgilerle giriş yap.
+              </p>
+            </div>
           </div>
           <LoginForm />
           <p className="text-center text-xs text-muted-foreground lg:text-left">
