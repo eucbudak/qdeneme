@@ -30,7 +30,7 @@ export function HeroIllustration({ className }: { className?: string }) {
         {/* Stock photo — yuvarlatılmış, brand çerçeveli */}
         <div className="absolute inset-12 overflow-hidden rounded-[2rem] ring-4 ring-card shadow-2xl">
           <Image
-            src="/student.jpg"
+            src="/student.png"
             alt="Çalışan öğrenci"
             fill
             sizes="(min-width: 1024px) 500px, 90vw"
