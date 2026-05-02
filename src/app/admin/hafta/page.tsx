@@ -30,6 +30,7 @@ type WeekRow = {
   id: string;
   exam_date: string;
   selection_deadline: string;
+  change_lock_at: string | null;
   is_locked: boolean;
   institutions: { name: string } | null;
 };
@@ -46,14 +47,14 @@ export default async function WeeksPage() {
   const today = new Date().toISOString().slice(0, 10);
   const { data: upcoming = [] } = await supabase
     .from("exam_weeks")
-    .select("id, exam_date, selection_deadline, is_locked, institutions(name)")
+    .select("id, exam_date, selection_deadline, change_lock_at, is_locked, institutions(name)")
     .gte("exam_date", today)
     .order("exam_date")
     .returns<WeekRow[]>();
 
   const { data: past = [] } = await supabase
     .from("exam_weeks")
-    .select("id, exam_date, selection_deadline, is_locked, institutions(name)")
+    .select("id, exam_date, selection_deadline, change_lock_at, is_locked, institutions(name)")
     .lt("exam_date", today)
     .order("exam_date", { ascending: false })
     .limit(20)

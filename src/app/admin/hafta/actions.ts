@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { computeDeadline } from "@/lib/date";
+import { computeChangeLock, computeDeadline } from "@/lib/date";
 import type { InstitutionType } from "@/lib/db/types";
 
 async function requireAdminClient() {
@@ -31,6 +31,9 @@ export async function createExamWeek(
 
     const institutionId = String(formData.get("institution_id") ?? "").trim();
     const examDate = String(formData.get("exam_date") ?? "").trim();
+    const customDeadline = String(formData.get("selection_deadline") ?? "").trim();
+    const customChangeLock = String(formData.get("change_lock_at") ?? "").trim();
+
     if (!institutionId || !examDate) {
       return { ok: false, error: "Lokasyon ve tarih gerekli." };
     }
@@ -45,7 +48,41 @@ export async function createExamWeek(
       .single<{ id: string; type: InstitutionType; has_capacity: boolean }>();
     if (!inst) return { ok: false, error: "Lokasyon bulunamadı." };
 
-    const deadline = computeDeadline(examDate);
+    const examMidnight = new Date(`${examDate}T00:00:00+03:00`);
+
+    let deadline: string;
+    if (customDeadline) {
+      const d = new Date(`${customDeadline}:00+03:00`);
+      if (isNaN(d.getTime())) {
+        return { ok: false, error: "Geçersiz atama tarihi." };
+      }
+      if (d.getTime() >= examMidnight.getTime()) {
+        return {
+          ok: false,
+          error: "Atama tarihi sınav tarihinden önce olmalı.",
+        };
+      }
+      deadline = d.toISOString();
+    } else {
+      deadline = computeDeadline(examDate);
+    }
+
+    let changeLock: string | null = null;
+    if (customChangeLock) {
+      const d = new Date(`${customChangeLock}:00+03:00`);
+      if (isNaN(d.getTime())) {
+        return { ok: false, error: "Geçersiz değişiklik tarihi." };
+      }
+      if (d.getTime() > new Date(deadline).getTime()) {
+        return {
+          ok: false,
+          error: "Değişiklik kilit tarihi atama tarihinden sonra olamaz.",
+        };
+      }
+      changeLock = d.toISOString();
+    } else {
+      changeLock = computeChangeLock(examDate);
+    }
 
     const { data: week, error: weekErr } = await supabase
       .from("exam_weeks")
@@ -53,6 +90,7 @@ export async function createExamWeek(
         institution_id: institutionId,
         exam_date: examDate,
         selection_deadline: deadline,
+        change_lock_at: changeLock,
       })
       .select("id")
       .single<{ id: string }>();
@@ -92,6 +130,85 @@ export async function deleteExamWeek(id: string) {
   await supabase.from("exam_weeks").delete().eq("id", id);
   revalidatePath("/admin/hafta");
   redirect("/admin/hafta");
+}
+
+export async function updateExamWeekDates(
+  examWeekId: string,
+  patch: {
+    deadlineLocal?: string; // "YYYY-MM-DDTHH:mm" — İstanbul, atama tarihi
+    changeLockLocal?: string | null; // "YYYY-MM-DDTHH:mm" veya null = sıfırla
+  },
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const supabase = await requireAdminClient();
+
+    const { data: week } = await supabase
+      .from("exam_weeks")
+      .select("exam_date, selection_deadline, change_lock_at")
+      .eq("id", examWeekId)
+      .single<{
+        exam_date: string;
+        selection_deadline: string;
+        change_lock_at: string | null;
+      }>();
+    if (!week) return { ok: false, error: "Hafta bulunamadı." };
+
+    const examMidnight = new Date(`${week.exam_date}T00:00:00+03:00`);
+    const update: {
+      selection_deadline?: string;
+      change_lock_at?: string | null;
+      is_locked?: boolean;
+    } = { is_locked: false };
+
+    let deadlineMs = new Date(week.selection_deadline).getTime();
+    if (patch.deadlineLocal !== undefined) {
+      if (!patch.deadlineLocal) {
+        return { ok: false, error: "Atama tarihi gerekli." };
+      }
+      const d = new Date(`${patch.deadlineLocal}:00+03:00`);
+      if (isNaN(d.getTime())) {
+        return { ok: false, error: "Geçersiz atama tarihi." };
+      }
+      if (d.getTime() >= examMidnight.getTime()) {
+        return { ok: false, error: "Atama tarihi sınav tarihinden önce olmalı." };
+      }
+      update.selection_deadline = d.toISOString();
+      deadlineMs = d.getTime();
+    }
+
+    if (patch.changeLockLocal !== undefined) {
+      if (patch.changeLockLocal === null || patch.changeLockLocal === "") {
+        update.change_lock_at = null;
+      } else {
+        const d = new Date(`${patch.changeLockLocal}:00+03:00`);
+        if (isNaN(d.getTime())) {
+          return { ok: false, error: "Geçersiz değişiklik tarihi." };
+        }
+        if (d.getTime() > deadlineMs) {
+          return {
+            ok: false,
+            error: "Değişiklik kilit tarihi atama tarihinden sonra olamaz.",
+          };
+        }
+        update.change_lock_at = d.toISOString();
+      }
+    }
+
+    const { error } = await supabase
+      .from("exam_weeks")
+      .update(update)
+      .eq("id", examWeekId);
+    if (error) return { ok: false, error: error.message };
+
+    revalidatePath(`/admin/hafta/${examWeekId}`);
+    revalidatePath("/admin/hafta");
+    return { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Beklenmeyen hata.",
+    };
+  }
 }
 
 // ============ Sessions ============

@@ -46,17 +46,28 @@ export function formatTime(value: string | Date): string {
   }).format(d);
 }
 
-/**
- * Sınav tarihinden (exam_date: "YYYY-MM-DD") 10 gün önce,
- * İstanbul saatiyle 23:59:59 olarak deadline timestamp'i döner.
- */
-export function computeDeadline(examDate: string): string {
-  // exam_date İstanbul saat diliminde 00:00 kabul edilir
+function offsetExamDate(examDate: string, daysBefore: number): string {
   const istanbulMidnight = new Date(`${examDate}T00:00:00+03:00`);
-  istanbulMidnight.setUTCDate(istanbulMidnight.getUTCDate() - 10);
+  istanbulMidnight.setUTCDate(istanbulMidnight.getUTCDate() - daysBefore);
   // Aynı gün 23:59:59 İstanbul = 20:59:59 UTC
   istanbulMidnight.setUTCHours(20, 59, 59, 999);
   return istanbulMidnight.toISOString();
+}
+
+/**
+ * Otomatik atama tarihi: sınavdan 7 gün önce, İstanbul 23:59:59.
+ * Bu tarih geçince cron, varsayılan yayını atayıp haftayı kilitler.
+ */
+export function computeDeadline(examDate: string): string {
+  return offsetExamDate(examDate, 7);
+}
+
+/**
+ * Değişiklik kilit tarihi: sınavdan 10 gün önce, İstanbul 23:59:59.
+ * Bu tarih geçince öğrenci seçim ekleyemez/değiştiremez (deadline'dan önce).
+ */
+export function computeChangeLock(examDate: string): string {
+  return offsetExamDate(examDate, 10);
 }
 
 /**

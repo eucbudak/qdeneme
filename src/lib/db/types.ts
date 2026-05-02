@@ -28,7 +28,8 @@ export type ExamWeek = {
   id: string;
   institution_id: string;
   exam_date: string; // ISO date (YYYY-MM-DD)
-  selection_deadline: string; // ISO timestamp
+  selection_deadline: string; // ISO timestamp — bu tarihten sonra varsayılana atanır
+  change_lock_at: string | null; // ISO timestamp — bu tarihten sonra öğrenci değişiklik yapamaz (NULL ise kullanılmaz)
   is_locked: boolean;
 };
 
@@ -66,4 +67,45 @@ export type AdminAlert = {
   reason: AlertReason;
   created_at: string;
   is_resolved: boolean;
+};
+
+export type GradeLevel = "GRADE_9" | "GRADE_10" | "GRADE_11" | "GRADE_12" | "MEZUN";
+export type StudyTrack = "SAY" | "EA" | "DIL" | "SOZEL";
+export type LeadStatus = "NEW" | "CONTACTING" | "NOT_REACHED" | "CONVERTED" | "REJECTED";
+
+export type LeadApplication = {
+  id: string;
+  full_name: string;
+  grade: GradeLevel;
+  track: StudyTrack;
+  phone: string;
+  parent_phone: string | null;
+  preferred_institution_id: string;
+  status: LeadStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const GRADE_LABELS: Record<GradeLevel, string> = {
+  GRADE_9: "9. Sınıf",
+  GRADE_10: "10. Sınıf",
+  GRADE_11: "11. Sınıf",
+  GRADE_12: "12. Sınıf",
+  MEZUN: "Mezun",
+};
+
+export const TRACK_LABELS: Record<StudyTrack, string> = {
+  SAY: "Sayısal",
+  EA: "Eşit Ağırlık",
+  DIL: "Dil",
+  SOZEL: "Sözel",
+};
+
+export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
+  NEW: "Yeni",
+  CONTACTING: "Aranıyor",
+  NOT_REACHED: "Ulaşılamadı",
+  CONVERTED: "Kayıt Oldu",
+  REJECTED: "İlgilenmiyor",
 };

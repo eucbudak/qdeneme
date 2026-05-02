@@ -18,17 +18,24 @@ export async function saveSelection(
     // Hafta geçerli mi ve deadline?
     const { data: week } = await supabase
       .from("exam_weeks")
-      .select("id, institution_id, selection_deadline, is_locked")
+      .select("id, institution_id, selection_deadline, change_lock_at, is_locked")
       .eq("id", examWeekId)
       .single<{
         id: string;
         institution_id: string;
         selection_deadline: string;
+        change_lock_at: string | null;
         is_locked: boolean;
       }>();
     if (!week) return { ok: false, error: "Hafta bulunamadı." };
     if (week.is_locked || new Date(week.selection_deadline).getTime() < Date.now()) {
       return { ok: false, error: "Seçim süresi doldu." };
+    }
+    if (
+      week.change_lock_at !== null &&
+      new Date(week.change_lock_at).getTime() < Date.now()
+    ) {
+      return { ok: false, error: "Değişiklik dönemi kapandı." };
     }
 
     // Öğrencinin lokasyonu haftayla eşleşiyor mu?
