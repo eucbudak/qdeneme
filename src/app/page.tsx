@@ -11,8 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand-mark";
 import { HeroIllustration } from "@/components/hero-illustration";
+import { HeroRippleBg } from "@/components/hero-ripple-bg";
+import { WhyQSection } from "@/components/sections/why-q";
+import { FaqSection } from "@/components/sections/faq";
+import { LocationsSection } from "@/components/sections/locations";
+import { PublishersStrip } from "@/components/sections/publishers-strip";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { LeadForm } from "./lead-form";
 
 export default async function Home() {
@@ -30,14 +34,20 @@ export default async function Home() {
     redirect(profile?.role === "ADMIN" ? "/admin" : "/student");
   }
 
-  // Anonim ziyaretçiler için institutions RLS okuma izni yok — admin client ile çek.
-  // Lokasyon listesi zaten public bir bilgi (dropdown'da gösteriliyor).
-  const adminClient = createAdminClient();
-  const { data: institutions = [] } = await adminClient
+  // Migration 0004 ile institutions tablosuna anon read açıldı; admin client'a gerek kalmadı.
+  const { data: institutions = [] } = await supabase
     .from("institutions")
-    .select("id, name")
+    .select("id, name, address, phone, maps_url")
     .order("name")
-    .returns<{ id: string; name: string }[]>();
+    .returns<
+      {
+        id: string;
+        name: string;
+        address: string | null;
+        phone: string | null;
+        maps_url: string | null;
+      }[]
+    >();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -54,7 +64,9 @@ export default async function Home() {
       </header>
 
       <main className="flex flex-1 flex-col">
-        <section className="mx-auto grid w-full max-w-6xl gap-12 px-4 pb-12 pt-8 lg:grid-cols-2 lg:items-center lg:py-20">
+        <section className="relative overflow-hidden">
+          <HeroRippleBg />
+          <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pb-12 pt-8 lg:grid-cols-2 lg:items-center lg:py-20">
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full border bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
               <Star className="h-3 w-3 fill-primary text-primary" />
@@ -83,7 +95,12 @@ export default async function Home() {
           </div>
 
           <HeroIllustration className="mx-auto aspect-square w-full max-w-md" />
+          </div>
         </section>
+
+        <WhyQSection />
+
+        <LocationsSection institutions={institutions ?? []} />
 
         <section
           id="nasil"
@@ -116,6 +133,10 @@ export default async function Home() {
             />
           </div>
         </section>
+
+        <PublishersStrip />
+
+        <FaqSection />
 
         <section
           id="basvuru"

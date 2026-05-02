@@ -13,6 +13,9 @@ export type Institution = {
   name: string;
   type: InstitutionType;
   has_capacity: boolean;
+  address: string | null;
+  phone: string | null;
+  maps_url: string | null;
 };
 
 export type Profile = {

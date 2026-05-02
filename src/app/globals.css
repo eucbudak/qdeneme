@@ -190,4 +190,24 @@
   .animate-float {
     animation: float-soft 4s ease-in-out infinite;
   }
+  @keyframes ripple-rise {
+    0% { transform: translateY(20px) scale(0.6); opacity: 0; }
+    20% { opacity: var(--ripple-opacity, 0.55); }
+    80% { opacity: var(--ripple-opacity, 0.55); }
+    100% { transform: translateY(-120px) scale(1.1); opacity: 0; }
+  }
+  .animate-ripple {
+    animation: ripple-rise var(--ripple-duration, 9s) ease-in-out infinite;
+    animation-delay: var(--ripple-delay, 0s);
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 35s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
 }
