@@ -2,6 +2,7 @@ import {
   CalendarDays,
   Clock,
   FileBarChart,
+  Inbox,
   LayoutDashboard,
   Users,
 } from "lucide-react";
@@ -44,5 +45,10 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin/rapor",
     label: "Rapor",
     icon: <FileBarChart className={ICON_CLASS} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/leads",
+    label: "Ön Başvurular",
+    icon: <Inbox className={ICON_CLASS} strokeWidth={2} />,
   },
 ];
