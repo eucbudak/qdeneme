@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand-mark";
 import { HeroIllustration } from "@/components/hero-illustration";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { LeadForm } from "./lead-form";
 
 export default async function Home() {
@@ -29,7 +30,10 @@ export default async function Home() {
     redirect(profile?.role === "ADMIN" ? "/admin" : "/student");
   }
 
-  const { data: institutions = [] } = await supabase
+  // Anonim ziyaretçiler için institutions RLS okuma izni yok — admin client ile çek.
+  // Lokasyon listesi zaten public bir bilgi (dropdown'da gösteriliyor).
+  const adminClient = createAdminClient();
+  const { data: institutions = [] } = await adminClient
     .from("institutions")
     .select("id, name")
     .order("name")
