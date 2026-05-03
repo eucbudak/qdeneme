@@ -51,15 +51,28 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5">
-        <BrandMark size="sm" href={null} />
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="#basvuru">Ön başvuru</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/login">Giriş yap</Link>
-          </Button>
+      <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3">
+          <BrandMark size="sm" href={null} />
+          <nav className="hidden items-center gap-1 sm:flex">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="#lokasyonlar">Lokasyonlar</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="#nasil">Nasıl?</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="#basvuru">Ön Kayıt</Link>
+            </Button>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Button asChild size="sm" className="sm:hidden">
+              <Link href="#basvuru">Ön Kayıt</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/login">Giriş yap</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -84,7 +97,7 @@ export default async function Home() {
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg" className="gap-2">
                 <Link href="#basvuru">
-                  Ön başvuru yap
+                  Ön Kayıt yap
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -104,7 +117,7 @@ export default async function Home() {
 
         <section
           id="nasil"
-          className="mx-auto w-full max-w-6xl px-4 py-12 lg:py-16"
+          className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-12 lg:py-16"
         >
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-bold sm:text-3xl">3 adımda</h2>
@@ -140,13 +153,13 @@ export default async function Home() {
 
         <section
           id="basvuru"
-          className="border-t bg-muted/30 py-14 lg:py-20"
+          className="scroll-mt-20 border-t bg-muted/30 py-14 lg:py-20"
         >
           <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 lg:grid-cols-2 lg:items-start">
             <div className="space-y-4">
               <span className="inline-flex items-center gap-2 rounded-full border bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
                 <Send className="h-3 w-3 text-primary" />
-                Ön başvuru
+                Ön Kayıt
               </span>
               <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
                 Kayıt olmak istiyor musun? <br />

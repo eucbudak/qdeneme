@@ -16,7 +16,10 @@ export function LocationsSection({
   if (!institutions || institutions.length === 0) return null;
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-12 lg:py-16">
+    <section
+      id="lokasyonlar"
+      className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-12 lg:py-16"
+    >
       <div className="mb-8 max-w-2xl">
         <span className="inline-flex items-center gap-2 rounded-full border bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
           <Building2 className="h-3 w-3 text-primary" />
