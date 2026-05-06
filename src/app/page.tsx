@@ -111,6 +111,8 @@ export default async function Home() {
           </div>
         </section>
 
+        <PublishersStrip />
+
         <WhyQSection />
 
         <LocationsSection institutions={institutions ?? []} />
@@ -146,8 +148,6 @@ export default async function Home() {
             />
           </div>
         </section>
-
-        <PublishersStrip />
 
         <FaqSection />
 
