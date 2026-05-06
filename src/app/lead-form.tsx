@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import confetti from "canvas-confetti";
 import { Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,34 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { GRADE_LABELS, TRACK_LABELS } from "@/lib/db/types";
+import { maskTrPhone } from "@/lib/phone-mask";
 import { submitLeadApplication } from "./lead-actions";
+
+function fireConfetti() {
+  const colors = ["#3b82f6", "#22c55e", "#f59e0b", "#ec4899"];
+  confetti({
+    particleCount: 80,
+    spread: 70,
+    origin: { y: 0.7 },
+    colors,
+  });
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.7 },
+      colors,
+    });
+    confetti({
+      particleCount: 50,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.7 },
+      colors,
+    });
+  }, 200);
+}
 
 type Institution = { id: string; name: string };
 
@@ -27,6 +55,8 @@ export function LeadForm({ institutions }: { institutions: Institution[] }) {
   const [grade, setGrade] = useState<string>("");
   const [track, setTrack] = useState<string>("");
   const [institutionId, setInstitutionId] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [parentPhone, setParentPhone] = useState<string>("");
   const [done, setDone] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -39,11 +69,14 @@ export function LeadForm({ institutions }: { institutions: Institution[] }) {
       const res = await submitLeadApplication(formData);
       if (res.ok) {
         toast.success("Başvurun alındı, kurum yakında seninle iletişime geçecek.");
+        fireConfetti();
         setDone(true);
         formRef.current?.reset();
         setGrade("");
         setTrack("");
         setInstitutionId("");
+        setPhone("");
+        setParentPhone("");
       } else {
         toast.error(res.error ?? "Hata");
       }
@@ -134,7 +167,9 @@ export function LeadForm({ institutions }: { institutions: Institution[] }) {
             required
             inputMode="tel"
             autoComplete="tel"
-            placeholder="05XX XXX XX XX"
+            placeholder="0 (5XX) XXX XX XX"
+            value={phone}
+            onChange={(e) => setPhone(maskTrPhone(e.target.value))}
           />
         </div>
         <div className="space-y-2">
@@ -149,7 +184,9 @@ export function LeadForm({ institutions }: { institutions: Institution[] }) {
             name="parent_phone"
             type="tel"
             inputMode="tel"
-            placeholder="05XX XXX XX XX"
+            placeholder="0 (5XX) XXX XX XX"
+            value={parentPhone}
+            onChange={(e) => setParentPhone(maskTrPhone(e.target.value))}
           />
         </div>
       </div>

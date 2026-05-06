@@ -14,10 +14,16 @@ import { HeroIllustration } from "@/components/hero-illustration";
 import { HeroRippleBg } from "@/components/hero-ripple-bg";
 import { WhyQSection } from "@/components/sections/why-q";
 import { FaqSection } from "@/components/sections/faq";
+import { LiveStats } from "@/components/sections/live-stats";
 import { LocationsSection } from "@/components/sections/locations";
 import { PublishersStrip } from "@/components/sections/publishers-strip";
+import { StickyCta } from "@/components/sticky-cta";
+import { fetchHomeStats } from "@/lib/db/home-stats";
 import { createClient } from "@/lib/supabase/server";
 import { LeadForm } from "./lead-form";
+
+// Hero altındaki canlı sayaç şeridi için yayın sayısı (publishers-strip ile aynı tutalım)
+const PUBLISHER_COUNT = 29;
 
 export default async function Home() {
   const supabase = await createClient();
@@ -48,6 +54,9 @@ export default async function Home() {
         maps_url: string | null;
       }[]
     >();
+
+  // Canlı sayaç şeridi için admin sayımları (yalnızca count, veri yok)
+  const stats = await fetchHomeStats();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -110,6 +119,12 @@ export default async function Home() {
           <HeroIllustration className="mx-auto aspect-square w-full max-w-md" />
           </div>
         </section>
+
+        <LiveStats
+          stats={stats}
+          publisherCount={PUBLISHER_COUNT}
+          locationCount={institutions?.length ?? 0}
+        />
 
         <PublishersStrip />
 
@@ -192,12 +207,14 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="border-t py-6">
+      <footer className="border-t py-6 pb-20 lg:pb-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground">
           <BrandMark size="sm" href={null} className="opacity-70" />
           <span>© Q Deneme</span>
         </div>
       </footer>
+
+      <StickyCta />
     </div>
   );
 }
