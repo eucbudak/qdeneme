@@ -77,9 +77,6 @@ export function PublishersStrip() {
         <h2 className="mt-3 text-xl font-bold tracking-tight sm:text-2xl">
           Türkiye Geneli Seçkin Yayınlar
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {PUBLISHERS.length}+ yayınevi · TYT, AYT ve LGS uyumlu
-        </p>
       </div>
       <div
         className="group/strip relative overflow-hidden"
