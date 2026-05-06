@@ -1,37 +1,62 @@
+import Image from "next/image";
 import { BookOpen } from "lucide-react";
 
 type Publisher = {
   name: string;
-  // Tailwind text color (text-...)
-  color: string;
-  initial: string;
+  // /public/publishers/<slug>.png — Canva grid'inden kırpıldı
+  slug: string;
 };
 
 const PUBLISHERS: Publisher[] = [
-  { name: "3D Yayınları", color: "text-rose-500", initial: "3D" },
-  { name: "Karekök", color: "text-emerald-600", initial: "K" },
-  { name: "Limit", color: "text-blue-600", initial: "L" },
-  { name: "Apotemi", color: "text-amber-600", initial: "A" },
-  { name: "Esen", color: "text-violet-600", initial: "E" },
-  { name: "Bilgi Sarmal", color: "text-cyan-600", initial: "B" },
-  { name: "Çap", color: "text-pink-600", initial: "Ç" },
-  { name: "Final", color: "text-orange-600", initial: "F" },
-  { name: "Hız", color: "text-indigo-600", initial: "H" },
-  { name: "Acil", color: "text-red-600", initial: "A" },
+  { name: "3D Yayınları", slug: "3d" },
+  { name: "Acil Yayınları", slug: "acil" },
+  { name: "Ankara Yayıncılık", slug: "ankara" },
+  { name: "Apotemi Yayınları", slug: "apotemi" },
+  { name: "Barış Yayınları", slug: "baris" },
+  { name: "Bilgi Sarmal", slug: "bilgi-sarmal" },
+  { name: "Çap Yayınları", slug: "cap" },
+  { name: "Endemik Yayınları", slug: "endemik" },
+  { name: "Ephesus Yayınları", slug: "ephesus" },
+  { name: "Esen Yayınları", slug: "esen" },
+  { name: "Hız ve Renk", slug: "hiz-ve-renk" },
+  { name: "Karekök Yayınları", slug: "karekok" },
+  { name: "Limit Yayınları", slug: "limit" },
+  { name: "Miray Yayınları", slug: "miray" },
+  { name: "Okyanus Yayınları", slug: "okyanus" },
+  { name: "Orbital Yayınları", slug: "orbital" },
+  { name: "Origami Yayınları", slug: "origami" },
+  { name: "Orijinal Matematik", slug: "orijinal-matematik" },
+  { name: "Özdebir Yayınları", slug: "ozdebir" },
+  { name: "Palme Yayınevi", slug: "palme" },
+  { name: "Paraf Yayınları", slug: "paraf" },
+  { name: "Paylaşım Yayınları", slug: "paylasim" },
+  { name: "Proba Yayınları", slug: "proba" },
+  { name: "Sonuç Yayınları", slug: "sonuc" },
+  { name: "Supara Yayınları", slug: "supara" },
+  { name: "Tammat Yayıncılık", slug: "tammat" },
+  { name: "Toprak Yayıncılık", slug: "toprak" },
+  { name: "ÜçDörtBeş Yayınları", slug: "ucdortbes" },
+  { name: "VIP Yayınları", slug: "vip" },
 ];
 
 function PublisherCard({ p }: { p: Publisher }) {
   return (
-    <div className="group flex h-20 w-44 shrink-0 items-center gap-3 rounded-xl border bg-card/80 px-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-      <span
-        className={`flex h-12 w-12 items-center justify-center rounded-lg bg-muted font-mono text-lg font-bold ${p.color} grayscale transition-all group-hover:grayscale-0`}
-      >
-        {p.initial}
-      </span>
+    <div className="group flex h-24 w-44 shrink-0 items-center gap-3 rounded-2xl border bg-card/90 px-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-border/60">
+        <Image
+          src={`/publishers/${p.slug}.png`}
+          alt={`${p.name} logosu`}
+          fill
+          sizes="64px"
+          className="object-contain p-1 grayscale opacity-80 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100"
+        />
+      </div>
       <div className="min-w-0">
-        <div className="truncate text-sm font-semibold">{p.name}</div>
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          Yayınları
+        <div className="truncate text-sm font-semibold leading-tight">
+          {p.name}
+        </div>
+        <div className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+          Yayınevi
         </div>
       </div>
     </div>
@@ -53,7 +78,7 @@ export function PublishersStrip() {
           Tanıdık yayınlar, her hafta yeni deneme
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          TYT/AYT&apos;ye hazırlanırken tercih ettiğin markalar Q Deneme&apos;de.
+          {PUBLISHERS.length}+ yayınevi · TYT, AYT ve LGS uyumlu
         </p>
       </div>
       <div
@@ -67,7 +92,7 @@ export function PublishersStrip() {
       >
         <div className="flex w-max animate-marquee gap-3">
           {doubled.map((p, i) => (
-            <PublisherCard key={`${p.name}-${i}`} p={p} />
+            <PublisherCard key={`${p.slug}-${i}`} p={p} />
           ))}
         </div>
       </div>
