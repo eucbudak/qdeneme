@@ -10,20 +10,19 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand-mark";
-import { HeroIllustration } from "@/components/hero-illustration";
+import { HeroProductMockup } from "@/components/hero-product-mockup";
 import { HeroRippleBg } from "@/components/hero-ripple-bg";
+import { Reveal } from "@/components/reveal";
 import { WhyQSection } from "@/components/sections/why-q";
 import { FaqSection } from "@/components/sections/faq";
 import { LiveStats } from "@/components/sections/live-stats";
 import { LocationsSection } from "@/components/sections/locations";
 import { PublishersStrip } from "@/components/sections/publishers-strip";
+import { TestimonialsSection } from "@/components/sections/testimonials";
 import { StickyCta } from "@/components/sticky-cta";
 import { fetchHomeStats } from "@/lib/db/home-stats";
 import { createClient } from "@/lib/supabase/server";
 import { LeadForm } from "./lead-form";
-
-// Hero altındaki canlı sayaç şeridi için yayın sayısı (publishers-strip ile aynı tutalım)
-const PUBLISHER_COUNT = 29;
 
 export default async function Home() {
   const supabase = await createClient();
@@ -116,55 +115,68 @@ export default async function Home() {
             </div>
           </div>
 
-          <HeroIllustration className="mx-auto aspect-square w-full max-w-md" />
+          <HeroProductMockup className="mx-auto aspect-square w-full max-w-md" />
           </div>
         </section>
 
         <LiveStats
           stats={stats}
-          publisherCount={PUBLISHER_COUNT}
           locationCount={institutions?.length ?? 0}
         />
 
         <PublishersStrip />
 
-        <WhyQSection />
+        <Reveal as="section">
+          <WhyQSection />
+        </Reveal>
 
-        <LocationsSection institutions={institutions ?? []} />
+        <Reveal as="section">
+          <LocationsSection institutions={institutions ?? []} />
+        </Reveal>
+
+        <TestimonialsSection />
 
         <section
           id="nasil"
           className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-12 lg:py-16"
         >
-          <div className="mb-8 text-center">
+          <Reveal className="mb-8 text-center">
             <h2 className="text-2xl font-bold sm:text-3xl">3 adımda</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Sınav haftası şöyle akar
             </p>
-          </div>
+          </Reveal>
           <div className="grid gap-4 sm:grid-cols-3">
-            <StepCard
-              n={1}
-              icon={KeyRound}
-              title="Giriş yap"
-              desc="Kurumundan aldığın kullanıcı adı ve şifreyle."
-            />
-            <StepCard
-              n={2}
-              icon={BookOpen}
-              title="Yayını seç"
-              desc="Bu haftanın yayın seçenekleri arasından dilediğini."
-            />
-            <StepCard
-              n={3}
-              icon={Trophy}
-              title="Sınava gir"
-              desc="Belirlenen lokasyon ve saatte denemeni çöz."
-            />
+            <Reveal delay={0}>
+              <StepCard
+                n={1}
+                icon={KeyRound}
+                title="Giriş yap"
+                desc="Kurumundan aldığın kullanıcı adı ve şifreyle."
+              />
+            </Reveal>
+            <Reveal delay={120}>
+              <StepCard
+                n={2}
+                icon={BookOpen}
+                title="Yayını seç"
+                desc="Bu haftanın yayın seçenekleri arasından dilediğini."
+              />
+            </Reveal>
+            <Reveal delay={240}>
+              <StepCard
+                n={3}
+                icon={Trophy}
+                title="Sınava gir"
+                desc="Belirlenen lokasyon ve saatte denemeni çöz."
+              />
+            </Reveal>
           </div>
         </section>
 
-        <FaqSection />
+        <Reveal as="section">
+          <FaqSection />
+        </Reveal>
 
         <section
           id="basvuru"

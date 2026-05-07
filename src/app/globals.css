@@ -210,4 +210,25 @@
   .animate-marquee:hover {
     animation-play-state: paused;
   }
+
+  /* Scroll-triggered reveal — Reveal bileşeni kullanıyor */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal--in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
 }

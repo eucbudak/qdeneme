@@ -1,4 +1,4 @@
-import { BookOpenCheck, MapPin, Target, Users } from "lucide-react";
+import { CalendarRange, MapPin, Target, Users } from "lucide-react";
 import type { HomeStats } from "@/lib/db/home-stats";
 
 type StatItem = {
@@ -14,11 +14,9 @@ function formatCount(n: number, fallback: string): string {
 
 export function LiveStats({
   stats,
-  publisherCount,
   locationCount,
 }: {
   stats: HomeStats;
-  publisherCount: number;
   locationCount: number;
 }) {
   const items: StatItem[] = [
@@ -38,9 +36,9 @@ export function LiveStats({
       label: "lokasyon",
     },
     {
-      icon: BookOpenCheck,
-      value: `${publisherCount}+`,
-      label: "yayınevi",
+      icon: CalendarRange,
+      value: formatCount(stats.weekCount, "—"),
+      label: "deneme haftası",
     },
   ];
 
