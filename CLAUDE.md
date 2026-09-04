@@ -1,7 +1,8 @@
 # Q Deneme — Claude Code rehberi
 
 ## Proje özeti
-Haftalık deneme sınavı seçim platformu. 3 lokasyon (Q work, KNT Efeler, KNT Nazilli).
+Haftalık deneme sınavı seçim platformu. 2 lokasyon (Q work, KNT Efeler).
+KNT Nazilli şubesi kapandı, migration 0005 ile kaldırıldı.
 Öğrenci her hafta yayın seçer, kurum yöneticisi haftalık konfigürasyonu girer.
 
 ## Stack

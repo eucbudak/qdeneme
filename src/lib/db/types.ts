@@ -1,6 +1,8 @@
 // DB'deki enum ve entity tipleri. SQL schema ile birebir eşleşmeli.
 
-export type InstitutionType = "Q_WORK" | "KNT_EFELER" | "KNT_NAZILLI";
+// KNT_NAZILLI şube kapandığı için çıkarıldı (migration 0005). DB enum'ında değer
+// hâlâ duruyor — Postgres enum değeri düşürmeyi desteklemiyor — ama kullanılmıyor.
+export type InstitutionType = "Q_WORK" | "KNT_EFELER";
 export type UserRole = "STUDENT" | "ADMIN";
 export type AlertReason =
   | "DEFAULT_SESSION_FULL"

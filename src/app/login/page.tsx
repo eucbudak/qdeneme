@@ -24,7 +24,7 @@ export default function LoginPage() {
         </div>
         <div className="flex items-center gap-3 text-sm text-primary-foreground/70">
           <Star className="h-4 w-4 fill-current" />
-          <span>Q work · KNT Akademi Efeler · KNT Akademi Nazilli</span>
+          <span>Q work · KNT Akademi Efeler</span>
         </div>
       </aside>
 

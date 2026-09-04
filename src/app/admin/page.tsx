@@ -4,7 +4,6 @@ import {
   Building2,
   CalendarDays,
   Clock,
-  GraduationCap,
   School,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
@@ -36,7 +35,6 @@ type NextWeek = {
 const ICON_BY_TYPE: Record<InstitutionType, typeof Building2> = {
   Q_WORK: Building2,
   KNT_EFELER: School,
-  KNT_NAZILLI: GraduationCap,
 };
 
 export default async function AdminHome() {

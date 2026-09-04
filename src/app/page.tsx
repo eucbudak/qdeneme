@@ -194,10 +194,9 @@ export default async function Home() {
                 seni arayalım.
               </h2>
               <p className="text-sm text-muted-foreground sm:text-base">
-                Aşağıdaki formu doldur, ilgili kurum (KNT Akademi Efeler, Q
-                Work veya KNT Akademi Nazilli) en kısa sürede sana ulaşsın.
-                Yalnızca ön bilgi alıyoruz — kayıt sürecini telefonda
-                netleştireceğiz.
+                Aşağıdaki formu doldur, ilgili kurum (KNT Akademi Efeler veya Q
+                Work) en kısa sürede sana ulaşsın. Yalnızca ön bilgi alıyoruz —
+                kayıt sürecini telefonda netleştireceğiz.
               </p>
               <ul className="space-y-2 pt-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">

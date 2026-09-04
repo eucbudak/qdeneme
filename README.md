@@ -16,7 +16,6 @@ seçer, kurum yöneticisi haftalık sınav/seans/yayın yönetimini yapar.
 | ----------------- | ---------------------------- | -------- |
 | Q work            | Cmt/Paz/Pzt (çoklu seans)    | Var      |
 | KNT Akademi Efeler | Pazar 10:00                  | Yok      |
-| KNT Akademi Nazilli| Pazar 10:00                  | Yok      |
 
 ## Yerel çalıştırma
 
