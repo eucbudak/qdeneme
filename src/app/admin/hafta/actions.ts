@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { computeChangeLock, computeDeadline } from "@/lib/date";
 import type { InstitutionType } from "@/lib/db/types";
@@ -125,11 +124,31 @@ export async function createExamWeek(
   }
 }
 
-export async function deleteExamWeek(id: string) {
-  const supabase = await requireAdminClient();
-  await supabase.from("exam_weeks").delete().eq("id", id);
-  revalidatePath("/admin/hafta");
-  redirect("/admin/hafta");
+export async function deleteExamWeek(
+  id: string,
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const supabase = await requireAdminClient();
+    // Cascade: seanslar, yayınlar, seçimler ve uyarılar da birlikte silinir.
+    const { data, error } = await supabase
+      .from("exam_weeks")
+      .delete()
+      .eq("id", id)
+      .select("id")
+      .returns<{ id: string }[]>();
+    if (error) return { ok: false, error: error.message };
+    if (!data || data.length === 0) {
+      return { ok: false, error: "Hafta bulunamadı veya silme yetkin yok." };
+    }
+    revalidatePath("/admin/hafta");
+    revalidatePath("/admin");
+    return { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Beklenmeyen hata.",
+    };
+  }
 }
 
 export async function updateExamWeekDates(

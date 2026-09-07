@@ -17,6 +17,7 @@ import { ADMIN_NAV } from "@/lib/nav";
 import type { InstitutionType } from "@/lib/db/types";
 import { SessionsPanel } from "./sessions-panel";
 import { PublishersPanel } from "./publishers-panel";
+import { DeleteWeekButton } from "./delete-week-button";
 
 type WeekDetail = {
   id: string;
@@ -102,17 +103,26 @@ export default async function WeekDetailPage({
           title={`${week.institutions?.name} — ${formatDate(week.exam_date)}`}
           description={`Deadline: ${formatDate(week.selection_deadline)}`}
           action={
-            past ? (
-              <Badge variant="secondary" className="gap-1">
-                <Lock className="h-3 w-3" />
-                Seçim kilitli
-              </Badge>
-            ) : (
-              <Badge className="gap-1">
-                <Clock className="h-3 w-3" />
-                {timeUntil(week.selection_deadline)}
-              </Badge>
-            )
+            <>
+              {past ? (
+                <Badge variant="secondary" className="gap-1">
+                  <Lock className="h-3 w-3" />
+                  Seçim kilitli
+                </Badge>
+              ) : (
+                <Badge className="gap-1">
+                  <Clock className="h-3 w-3" />
+                  {timeUntil(week.selection_deadline)}
+                </Badge>
+              )}
+              <DeleteWeekButton
+                examWeekId={week.id}
+                weekLabel={`${week.institutions?.name ?? "Deneme"} — ${formatDate(
+                  week.exam_date,
+                )}`}
+                selectionCount={selCounts?.length ?? 0}
+              />
+            </>
           }
         />
 
