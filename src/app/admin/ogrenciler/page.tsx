@@ -22,7 +22,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ADMIN_NAV } from "@/lib/nav";
 import { NewStudentDialog } from "./new-student-dialog";
-import { ResetPasswordButton, ToggleActiveButton } from "./student-actions";
+import {
+  DeleteStudentButton,
+  EditStudentButton,
+  ResetPasswordButton,
+  ToggleActiveButton,
+} from "./student-actions";
 
 type StudentRow = {
   id: string;
@@ -107,6 +112,13 @@ export default async function StudentsPage() {
                         )}
                       </TableCell>
                       <TableCell className="space-x-2 text-right">
+                        <EditStudentButton
+                          studentId={s.id}
+                          fullName={s.full_name}
+                          username={s.username}
+                          institutionId={s.institution_id}
+                          institutions={institutions ?? []}
+                        />
                         <ResetPasswordButton
                           studentId={s.id}
                           studentName={s.full_name}
@@ -114,6 +126,10 @@ export default async function StudentsPage() {
                         <ToggleActiveButton
                           studentId={s.id}
                           isActive={s.is_active}
+                          studentName={s.full_name}
+                        />
+                        <DeleteStudentButton
+                          studentId={s.id}
                           studentName={s.full_name}
                         />
                       </TableCell>

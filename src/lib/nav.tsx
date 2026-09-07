@@ -4,6 +4,7 @@ import {
   FileBarChart,
   Inbox,
   LayoutDashboard,
+  MapPin,
   Users,
 } from "lucide-react";
 import type { NavItem } from "@/components/nav-links";
@@ -40,6 +41,11 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin/ogrenciler",
     label: "Öğrenciler",
     icon: <Users className={ICON_CLASS} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/lokasyonlar",
+    label: "Lokasyonlar",
+    icon: <MapPin className={ICON_CLASS} strokeWidth={2} />,
   },
   {
     href: "/admin/rapor",
